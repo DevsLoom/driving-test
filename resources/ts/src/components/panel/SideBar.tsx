@@ -1,97 +1,86 @@
-import { Box, NavLink, Stack, Text } from "@mantine/core";
+import { Icon } from "@iconify/react";
+import { Link } from "@inertiajs/react";
+import {
+    ActionIcon,
+    Anchor,
+    Box,
+    Group,
+    Image,
+    NavLink,
+    ScrollArea,
+    Stack,
+    Text,
+} from "@mantine/core";
+import { PANEL_LINKS } from "~/src/constants/PanelLinks";
+type NavItem = {
+    label: string;
+    path: string | null;
+    icon?: string;
+    items: NavItem[];
+};
 
-const data = [
-    {
-        label: "Analytics",
-        items: [
-            { label: "Dashboard", icon: "", path: "/dashboard", items: [] },
-        ],
-    },
-    {
-        label: "Apps",
-        items: [
-            {
-                label: "Test Management",
-                icon: "",
-                path: null,
-                items: [
-                    { label: "Tests", icon: "", path: "/test", items: [] },
-                    {
-                        label: "Questions Management",
-                        icon: "",
-                        path: null,
-                        items: [
-                            {
-                                label: "Category",
-                                icon: "",
-                                path: "/test",
-                                items: [],
-                            },
-                            {
-                                label: "Question",
-                                icon: "",
-                                path: "/test",
-                                items: [],
-                            },
-                        ],
-                    },
-                ],
-            },
-            {
-                label: "Posts",
-                icon: "",
-                path: "/posts",
-                items: [],
-            },
-        ],
-    },
-];
+const RenderNavItems = (items: NavItem[]) =>
+    items.map((item, i) => (
+        <NavLink
+            key={i}
+            label={item?.label}
+            href={item?.path || ""}
+            childrenOffset={28}
+            leftSection={
+                item.icon ? <Icon icon={item.icon} fontSize={22} /> : null
+            }
+            component={Link}
+        >
+            {item.items?.length > 0 && RenderNavItems(item.items)}
+        </NavLink>
+    ));
 
 const SideBar = () => {
     return (
-        <Box pt={40}>
-            <Stack>
-                {data?.map((item, i) => (
-                    <Box>
-                        <Text size="xs" c="dimmed" pos="relative" className="before:absolute before:w-full before:h-2;',jmhjpjkl;j                                                                                                                                                                                                                        ">
-                            Apps & Pages
-                        </Text>
-                        <NavLink
-                            href="#required-for-focus"
-                            label="First parent link"
-                            // leftSection={<IconGauge size={16} stroke={1.5} />}
-                            childrenOffset={28}
-                        >
-                            <NavLink
-                                href="#required-for-focus"
-                                label="First child link"
-                            />
-                            <NavLink
-                                label="Second child link"
-                                href="#required-for-focus"
-                            />
-                            <NavLink
-                                label="Nested parent link"
-                                childrenOffset={28}
-                                href="#required-for-focus"
+        <Box p="lg">
+            <Group justify="space-between" mb="xl">
+                <Anchor
+                    component={Link}
+                    href="/admin/dashboard"
+                    underline="never"
+                    mx="auto"
+                >
+                    <Image
+                        w="100%"
+                        h={48}
+                        src="https://placehold.co/600x48?text=LOGO"
+                    />
+                </Anchor>
+
+                <ActionIcon
+                    radius="xl"
+                    variant="subtle"
+                    size="xl"
+                    hiddenFrom="md"
+                    color="gray"
+                    // onClick={close}
+                >
+                    <Icon icon="material-symbols:close-rounded" fontSize={22} />
+                </ActionIcon>
+            </Group>
+            <ScrollArea h="calc(100vh - 100px)">
+                <Stack pb="xl" gap="xl">
+                    {PANEL_LINKS.map((item, i) => (
+                        <Box key={i}>
+                            <Text
+                                fz="0.75rem"
+                                fw={500}
+                                pl="sm"
+                                c="dimmed"
+                                mb={6}
                             >
-                                <NavLink
-                                    label="First child link"
-                                    href="#required-for-focus"
-                                />
-                                <NavLink
-                                    label="Second child link"
-                                    href="#required-for-focus"
-                                />
-                                <NavLink
-                                    label="Third child link"
-                                    href="#required-for-focus"
-                                />
-                            </NavLink>
-                        </NavLink>
-                    </Box>
-                ))}
-            </Stack>
+                                {item?.label}
+                            </Text>
+                            {RenderNavItems(item?.items)}
+                        </Box>
+                    ))}
+                </Stack>
+            </ScrollArea>
         </Box>
     );
 };

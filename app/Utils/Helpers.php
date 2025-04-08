@@ -40,8 +40,16 @@ if (!function_exists('primaryKey')) {
 }
 
 if (!function_exists('paginate')) {
-    function paginate($payload, $count, $offset)
+    function paginate($payload)
     {
-        return ['data' => $payload, 'next_offset' => $offset, 'total' => $count];
+        return [
+            'data'         => $payload['data'],
+            'current_page' => $payload['current_page'],
+            'last_page'    => $payload['last_page'],
+            'per_page'     => $payload['per_page'],
+            'from'         => $payload['from'],
+            'to'           => $payload['to'],
+            'total'        => $payload['total'],
+        ];
     }
 }

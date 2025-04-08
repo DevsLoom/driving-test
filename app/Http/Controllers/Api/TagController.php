@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\TestRequest;
-use App\Models\Test;
+use App\Http\Requests\TagRequest;
+use App\Models\Tag;
 use Exception;
 
-class TestController extends Controller
+class TagController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,14 +17,14 @@ class TestController extends Controller
         try {
             $limit          = request()->input('limit') ?? 10;
             $offset         = request()->input('offset') ?? 0;
-            $orderBy        = request()->input('order_by') ?? 'position';
-            $orderDirection = request()->input('order_direction') ?? 'desc';
+            $orderBy        = request()->input('order_by') ?? 'name';
+            $orderDirection = request()->input('order_direction') ?? 'asc';
 
-            $fields    = [primaryKey(), 'name', 'image', 'position'];
+            $fields    = [primaryKey(), 'name'];
             $condition = [];
             $relations = [];
             $counts    = [];
-            $queries   = Test::query();
+            $queries   = Tag::query();
 
             if (request()->has('status') && request()->input('status')) {
                 $condition['status'] = request()->input('status');
@@ -44,9 +44,7 @@ class TestController extends Controller
 
             if (request()->has('search') && request()->input('search')) {
                 $searchValue = trim(request()->input('search'));
-                $queries     = $queries->where('name', 'like', '%' . $searchValue . '%')
-                    ->orWhere('slug', 'like', '%' . $searchValue . '%')
-                    ->orWhereJsonContains('tags', $searchValue);
+                $queries     = $queries->where('name', 'like', '%' . $searchValue . '%');
             }
 
             $queries->select($fields)->with($relations)->withCount($counts)->where(fn($q) => $q->where($condition))->orderBy($orderBy, $orderDirection);
@@ -64,14 +62,11 @@ class TestController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(TestRequest $request)
+    public function store(TagRequest $request)
     {
         try {
-            $lastEntry = Test::latest()->first();
-            $position  = $lastEntry ? $lastEntry->position + 1 : 1;
-
-            if ($query = Test::query()->create(array_merge($request->validated(), ['position' => $position]))) {
-                return entityResponse($query, 201, 'success', 'Test added successfully.');
+            if ($query = Tag::query()->create($request->validated())) {
+                return entityResponse($query, 201, 'success', 'Tag added successfully.');
             }
         } catch (Exception $e) {
             return messageResponse($e->getMessage(), 500, 'server_error');
@@ -87,7 +82,7 @@ class TestController extends Controller
             $searchKey = request()->input('searchKey') ?? primaryKey();
             $condition = [$searchKey => $id];
 
-            $fields    = [primaryKey(), 'name', 'image', 'tags', 'status'];
+            $fields    = [primaryKey(), 'name'];
             $relations = [];
             $counts    = [];
 
@@ -103,8 +98,8 @@ class TestController extends Controller
                 $counts = gettype(request()->input('counts')) === 'array' ? request()->input('counts') : explode(',', request()->input('counts'));
             }
 
-            if (!$query = Test::query()->select($fields)->with($relations)->withCount($counts)->where($condition)->first()) {
-                return messageResponse('Test not found...', 404, 'error');
+            if (!$query = Tag::query()->select($fields)->with($relations)->withCount($counts)->where($condition)->first()) {
+                return messageResponse('Tag not found...', 404, 'error');
             }
             return entityResponse($query);
         } catch (Exception $e) {
@@ -116,18 +111,17 @@ class TestController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(TestRequest $request, string $id)
+    public function update(TagRequest $request, string $id)
     {
         try {
             $searchKey = request()->input('searchKey') ?? primaryKey();
             $condition = [$searchKey => $id];
 
-            if (!$query = Test::query()->where($condition)->first()) {
-                return messageResponse('Test not found...', 404, 'error');
+            if (!$query = Tag::query()->where($condition)->first()) {
+                return messageResponse('Tag not found...', 404, 'error');
             }
-
             $query->update($request->validated());
-            return entityResponse($query, 201, 'success', 'Test updated successfully.');
+            return entityResponse($query, 201, 'success', 'Tag updated successfully.');
         } catch (Exception $e) {
             return messageResponse($e->getMessage(), 500, 'server_error');
         }
@@ -142,12 +136,12 @@ class TestController extends Controller
             $searchKey = request()->input('searchKey') ?? primaryKey();
             $condition = [$searchKey => $id];
 
-            if (!$query = Test::query()->where($condition)->first()) {
-                return messageResponse('Test not found...', 404, 'error');
+            if (!$query = Tag::query()->where($condition)->first()) {
+                return messageResponse('Tag not found...', 404, 'error');
             }
 
             $query->delete();
-            return messageResponse('Test deleted successfully');
+            return messageResponse('Tag deleted successfully');
         } catch (Exception $e) {
             return messageResponse($e->getMessage(), 500, 'server_error');
         }

@@ -2,6 +2,7 @@ import { AppShell } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FC, ReactNode } from "react";
 import Meta from "../components/Meta";
+import Header from "../components/panel/Header";
 import SideBar from "../components/panel/SideBar";
 
 const Panel: FC<{ children: ReactNode; title?: string }> = ({
@@ -13,17 +14,19 @@ const Panel: FC<{ children: ReactNode; title?: string }> = ({
         <>
             <Meta title={title} />
             <AppShell
-                // header={{ height: 60 }}
+                layout="alt"
+                header={{ height: 60 }}
                 navbar={{
-                    width: 250,
-                    breakpoint: "sm",
-                    collapsed: { mobile: !opened },
+                    width: 260,
+                    breakpoint: "md",
+                    collapsed: { mobile: opened },
                 }}
+                bg="#F9FAFB"
                 p="lg"
-                bg="#F4F5FA"
-                withBorder={false}
             >
-                {/* <AppShell.Header><Header /></AppShell.Header> */}
+                <AppShell.Header p="lg">
+                    <Header />
+                </AppShell.Header>
                 <AppShell.Navbar>
                     <SideBar />
                 </AppShell.Navbar>

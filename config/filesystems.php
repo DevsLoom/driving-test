@@ -60,6 +60,10 @@ return [
             'report' => false,
         ],
 
+        'regular' => [
+            'driver' => 'local',
+            'root'   => public_path() . '/uploads/',
+        ],
     ],
 
     /*
