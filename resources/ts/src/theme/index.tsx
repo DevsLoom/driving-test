@@ -7,7 +7,7 @@ import "@mantine/dates/styles.css";
 import "@mantine/notifications/styles.css";
 
 const theme = createTheme({
-    fontFamily: `Roboto, sans-serif`,
+    fontFamily: `Montserrat, sans-serif`,
     fontSmoothing: true,
 });
 const ThemeProvider: FC<{ children: ReactNode }> = ({ children }) => {

@@ -1,5 +1,6 @@
 import auth from './slices/auth';
 import { globalApiMiddleWares, globalApiReducers } from './slices/global';
+import { questionsApiMiddleWares, questionsApiReducers } from './slices/questions';
 import { theoryApiMiddleWares, theoryApiReducers } from './slices/theory';
 
 export const apiReducers = {
@@ -7,6 +8,7 @@ export const apiReducers = {
     
 	...globalApiReducers,
 	...theoryApiReducers,
+	...questionsApiReducers,
 };
 
 export const apiMiddleWares = [
@@ -14,4 +16,5 @@ export const apiMiddleWares = [
 
 	...globalApiMiddleWares,
 	...theoryApiMiddleWares,
+	...questionsApiMiddleWares,
 ];

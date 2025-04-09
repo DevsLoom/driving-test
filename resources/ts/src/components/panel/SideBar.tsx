@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react";
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import {
     ActionIcon,
     Anchor,
@@ -19,7 +19,7 @@ type NavItem = {
     items: NavItem[];
 };
 
-const RenderNavItems = (items: NavItem[]) =>
+const RenderNavItems = (items: NavItem[], link: string) =>
     items.map((item, i) => (
         <NavLink
             key={i}
@@ -27,15 +27,19 @@ const RenderNavItems = (items: NavItem[]) =>
             href={item?.path || ""}
             childrenOffset={28}
             leftSection={
-                item.icon ? <Icon icon={item.icon} fontSize={22} /> : null
+                item.icon ? <Icon icon={item.icon} fontSize={16} /> : null
             }
             component={Link}
+            fw={500}
+            active={item?.path === link}
         >
-            {item.items?.length > 0 && RenderNavItems(item.items)}
+            {item.items?.length > 0 && RenderNavItems(item.items, link)}
         </NavLink>
     ));
 
 const SideBar = () => {
+    const { url } = usePage();
+
     return (
         <Box p="lg">
             <Group justify="space-between" mb="xl">
@@ -64,19 +68,20 @@ const SideBar = () => {
                 </ActionIcon>
             </Group>
             <ScrollArea h="calc(100vh - 100px)">
-                <Stack pb="xl" gap="xl">
+                <Stack pb="xl" gap="lg">
                     {PANEL_LINKS.map((item, i) => (
                         <Box key={i}>
                             <Text
-                                fz="0.75rem"
+                                fz="0.70rem"
                                 fw={500}
                                 pl="sm"
                                 c="dimmed"
-                                mb={6}
+                                className="!tracking-wider"
+                                mb={2}
                             >
                                 {item?.label}
                             </Text>
-                            {RenderNavItems(item?.items)}
+                            {RenderNavItems(item?.items, url)}
                         </Box>
                     ))}
                 </Stack>

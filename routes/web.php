@@ -7,6 +7,10 @@ Route::get('/', fn() => inertia('Home'));
 Route::prefix('admin')->group(function () {
     Route::get('dashboard', fn() => inertia('panel/Dashboard'));
 
+    Route::prefix('question-manage')->group(function () {
+        Route::get('categories', fn() => inertia('panel/Questions/Categories/List'));
+    });
+
     Route::prefix('tests')->group(function () {
         Route::get('', fn() => inertia('panel/Tests/List'));
 

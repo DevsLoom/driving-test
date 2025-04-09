@@ -28,7 +28,7 @@ class QuestionController extends Controller
             $condition = [];
             $relations = [
                 'options:id,title',
-                'questionCorrectOption:id,question_id,option_id',
+                'questionCorrectOption',
                 'explanations:id,question_id,language,explanation',
             ];
             $counts  = [];
@@ -41,10 +41,6 @@ class QuestionController extends Controller
             if (request()->has('test_id') && request()->input('test_id')) {
                 $condition['test_id'] = request()->input('test_id');
             }
-
-            // if (request()->has('language') && request()->input('language')) {
-            //     $condition['language'] = request()->input('language');
-            // }
 
             if (request()->has('fields') && request()->input('fields')) {
                 $fields = gettype(request()->input('fields')) === 'array' ? request()->input('fields') : explode(',', request()->input('fields'));
@@ -70,6 +66,12 @@ class QuestionController extends Controller
             } else {
                 $queries = $queries->get();
             }
+
+            $queries = $queries->map(fn($q) => array_merge($q->only($fields), [
+                'options'               => $q->options,
+                'questionCorrectOption' => $q->questionCorrectOption ? $q->questionCorrectOption->option_id : null,
+                'explanations'          => $q->explanations,
+            ]));
             return entityResponse($queries);
         } catch (Exception $e) {
             return messageResponse($e->getMessage(), 500, 'server_error');
