@@ -9,6 +9,29 @@ use App\Http\Controllers\Api\TagController;
 use App\Http\Controllers\Api\TestController;
 use Illuminate\Support\Facades\Route;
 
+Route::prefix('auth')->group(function () {
+    Route::post('login', [\App\Http\Controllers\Api\Auth\LoginController::class, 'login']);
+    Route::post('register', [\App\Http\Controllers\Api\Auth\RegisterController::class, 'register']);
+
+    Route::prefix('register')->group(function () {
+        Route::post('', [\App\Http\Controllers\Api\Auth\RegisterController::class, 'register']);
+        Route::post('request', [\App\Http\Controllers\Api\Auth\RegisterController::class, 'registerRequest']);
+        Route::post('verify', [\App\Http\Controllers\Api\Auth\RegisterController::class, 'registerVerify']);
+    });
+
+    Route::prefix('forget')->group(function () {
+        Route::post('request', [\App\Http\Controllers\Api\Auth\ForgetController::class, 'forgetRequest']);
+        Route::post('verify', [\App\Http\Controllers\Api\Auth\ForgetController::class, 'forgetVerify']);
+        Route::post('password', [\App\Http\Controllers\Api\Auth\ForgetController::class, 'forgetPassword']);
+    });
+    Route::middleware(['auth:api', 'tokenCheck'])->group(function () {
+        Route::get('me', [\App\Http\Controllers\Api\Auth\LoginController::class, 'me']);
+        Route::patch('update', [\App\Http\Controllers\Api\Auth\LoginController::class, 'update']);
+        Route::post('change-password', [\App\Http\Controllers\Api\Auth\LoginController::class, 'changePassword']);
+        Route::post('logout', [\App\Http\Controllers\Api\Auth\LoginController::class, 'logout']);
+    });
+});
+
 Route::apiResource('tags', TagController::class)->except(['create', 'edit']);
 Route::apiResource('tests', TestController::class)->except(['create', 'edit']);
 Route::apiResource('questions', QuestionController::class)->except(['create', 'edit']);

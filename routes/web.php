@@ -2,7 +2,20 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn() => inertia('Home'));
+Route::get('/', fn() => redirect('login'));
+Route::get('login', fn() => inertia('auth/Login'));
+
+Route::prefix('register')->group(function () {
+    Route::get('', fn() => inertia('auth/Register/index'));
+    Route::get('verify', fn() => inertia('auth/Register/Verify'));
+    Route::get('request', fn() => inertia('auth/Register/Request'));
+});
+
+Route::prefix('forget-password')->group(function () {
+    Route::get('', fn() => inertia('auth/Forget/Request'));
+    Route::get('verify', fn() => inertia('auth/Forget/Verify'));
+    Route::get('new-password', fn() => inertia('auth/Forget/Password'));
+});
 
 Route::prefix('admin')->group(function () {
     Route::get('dashboard', fn() => inertia('panel/Dashboard'));
