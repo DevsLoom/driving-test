@@ -35,8 +35,8 @@ export const PANEL_LINKS = [
                 icon: "eos-icons:role-binding-outlined",
                 path: null,
                 items: [
-                    { label: "Employees", icon: "", path: "/test", items: [] },
-                    { label: "Roles", icon: "", path: "/test", items: [] },
+                    { label: "Stuffs", icon: "", path: "/admin/stuffs", items: [] },
+                    { label: "Roles", icon: "", path: "/admin/roles", items: [] },
                 ],
             },
         ],

@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('role_id')->nullable();
-            
+            $table->foreignId('role_id')->nullable();
+
             $table->string('provider_id')->nullable();
             $table->string('provider')->nullable();
 

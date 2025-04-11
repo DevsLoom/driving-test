@@ -1,19 +1,29 @@
 import { Icon } from "@iconify/react";
 import { Link } from "@inertiajs/react";
-import { ActionIcon, Button, Flex, Group, Text, Tooltip } from "@mantine/core";
+import { ActionIcon, Button, Flex, Group, Table, Tooltip } from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
+import AppTable from "~/src/components/ui/AppTable";
+import SearchBox from "~/src/components/ui/SearchBox";
+import Panel from "~/src/layouts/Panel";
 import { alertMessage, deleteAlertMessage } from "~/src/lib/helpers";
 import {
     useDeleteRoleMutation,
     useFetchRolesQuery,
 } from "~/src/store/actions/slices/roles";
+import { RoleType } from "~/src/types/roles";
+
+const headers = [
+    { field: "SL.", align: "left", w: 60 },
+    { field: "Name", align: "left", w: 300 },
+    { field: "Opt.", align: "center", w: 120 },
+];
 
 const Roles = () => {
-    const [items, setItems] = useState([]);
-    const [params, setParams] = useState({ offset: 0, limit: 10, search: "" });
+    const [items, setItems] = useState<RoleType[]>([]);
+    const [params, setParams] = useState({ offset: 1, limit: 50, search: "" });
     const [hasMore, setHasMore] = useState(true);
 
     const { data, isFetching, refetch } = useFetchRolesQuery(
@@ -28,11 +38,11 @@ const Roles = () => {
     }, 800);
 
     useEffect(() => {
-        if (data && data.length) {
+        if (data && data.data.length) {
             const mergeData = (
-                prevItems: TestType[],
-                newItems: TestType[],
-            ): TestType[] => {
+                prevItems: RoleType[],
+                newItems: RoleType[],
+            ): RoleType[] => {
                 return [
                     ...prevItems,
                     ...newItems.filter(
@@ -43,11 +53,11 @@ const Roles = () => {
                     ),
                 ];
             };
-            const payload = mergeData(items, data);
+            const payload = mergeData(items, data.data);
             setItems(payload);
         }
 
-        if (data && data.length < params.limit) {
+        if (data && data.data.length < params.limit) {
             setHasMore(false);
         }
     }, [data]);
@@ -114,7 +124,8 @@ const Roles = () => {
                                     fontSize={20}
                                 />
                             }
-                            onClick={open}
+                            component={Link}
+                            href={`/admin/roles/create`}
                             disabled={isFetching || result.isLoading}
                         >
                             Add New
@@ -124,40 +135,17 @@ const Roles = () => {
                 rows={items?.map((item, i) => (
                     <Table.Tr key={i}>
                         <Table.Td>{i + 1}</Table.Td>
-                        <Table.Td>
-                            <Group>
-                                <Image
-                                    w={40}
-                                    h={40}
-                                    src={imageUrlBuilder(item?.image)}
-                                />
-                                <Text size="sm">{item?.name}</Text>
-                            </Group>
-                        </Table.Td>
+                        <Table.Td>{item?.name}</Table.Td>
                         <Table.Td>
                             <Flex justify="center">
-                                <Tooltip label="View" withArrow>
-                                    <ActionIcon
-                                        radius="xl"
-                                        color="gray"
-                                        variant="subtle"
-                                        component={Link}
-                                        href={`/admin/tests/${item?.id}/show`}
-                                        disabled={result.isLoading}
-                                    >
-                                        <Icon icon="lets-icons:view" />
-                                    </ActionIcon>
-                                </Tooltip>
                                 <Tooltip label="Edit" withArrow>
                                     <ActionIcon
                                         radius="xl"
                                         color="blue"
                                         variant="subtle"
-                                        onClick={() => {
-                                            setSelectedId(item?.id);
-                                            open();
-                                        }}
                                         disabled={result.isLoading}
+                                        component={Link}
+                                        href={`/admin/roles/${item?.id}/edit`}
                                     >
                                         <Icon icon="cuida:edit-outline" />
                                     </ActionIcon>
@@ -182,7 +170,5 @@ const Roles = () => {
     );
 };
 
-Roles.layout = (page: any) => (
-    <Backend children={page} title="Role | Job Journey" />
-);
+Roles.layout = (page: any) => <Panel children={page} title="Roles" />;
 export default Roles;

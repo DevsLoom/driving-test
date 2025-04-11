@@ -1,7 +1,6 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { router, usePage } from "@inertiajs/react";
 import {
-    ActionIcon,
     Box,
     Button,
     Card,
@@ -175,7 +174,7 @@ const QuestionForm = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
             <Card withBorder>
                 <Card.Section inheritPadding py="sm" withBorder>
-                    <Text>Add Question</Text>
+                    <Text>{data ? "Update" : "Add"} Question</Text>
                 </Card.Section>
                 <Card.Section inheritPadding py="sm" withBorder>
                     <Stack gap="md">

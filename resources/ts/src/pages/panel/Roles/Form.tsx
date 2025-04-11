@@ -3,38 +3,34 @@ import { Link, router, usePage } from "@inertiajs/react";
 import {
     Button,
     Card,
-    Center,
     Checkbox,
     Fieldset,
     Flex,
     Grid,
-    Loader,
     ScrollArea,
     Stack,
     Text,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
-import SelectBox from "../../../components/ui/SelectBox";
-import TextBox from "../../../components/ui/TextBox";
-import { statusOptions } from "../../../constants/selectOptions";
-import { THEME } from "../../../constants/theme";
-import Backend from "../../../layouts/Backend";
+import AppLoader from "~/src/components/ui/AppLoader";
+import Panel from "~/src/layouts/Panel";
+import { alertMessage, validateError } from "~/src/lib/helpers";
 import {
     useCreateRoleMutation,
     useFetchPermissionsQuery,
     useFetchRoleQuery,
     useUpdateRoleMutation,
-} from "../../../store/actions/slices/roles";
-import { RoleFormType } from "../../../Type/role";
-import { alertMessage, validateError } from "../../../utils/helpers";
+} from "~/src/store/actions/slices/roles";
+import { RoleFormType } from "~/src/types/roles";
+import TextBox from "../../../components/ui/TextBox";
 
 const RoleForm = () => {
     const { props } = usePage();
     const { data: permissions } = useFetchPermissionsQuery("get_all=1");
 
-    const { data, isFetching, isError, error } = useFetchRoleQuery(props.id, {
+    const { data, isFetching } = useFetchRoleQuery(props.id, {
         skip: !props.id,
         refetchOnMountOrArgChange: true,
     });
@@ -59,8 +55,6 @@ const RoleForm = () => {
         },
     });
 
-    const form = watch();
-
     const successCallbackHandler = (res: any) => {
         if (res.status === "success") {
             notifications.show({
@@ -72,7 +66,7 @@ const RoleForm = () => {
                 color: "green",
             });
             reset();
-            router.visit("/admin/system/roles", { replace: true });
+            router.visit("/admin/roles", { replace: true });
         }
     };
 
@@ -83,7 +77,7 @@ const RoleForm = () => {
                 setError(fieldName as keyof RoleFormType, {
                     type: "manual",
                     message: errors[fieldName],
-                })
+                }),
             );
         } else {
             alertMessage({ title: err.message, icon: "error", timer: 2000 });
@@ -108,6 +102,7 @@ const RoleForm = () => {
         if (data && Object.keys(data).length > 0) {
             Object.keys(data).forEach((key) => {
                 if (data[key] !== null) {
+                   
                     setValue(key as keyof RoleFormType, data[key]);
                 }
             });
@@ -115,84 +110,48 @@ const RoleForm = () => {
     }, [data]);
 
     if (isFetching) {
-        return (
-            <Card
-                w={{ base: "100%", md: "50%" }}
-                h="calc(100vh - 200px)"
-                radius="lg"
-                mx="auto"
-            >
-                <Center h="100%">
-                    <Loader color={THEME.primary} size="xl" type="dots" />
-                </Center>
-            </Card>
-        );
+        return <AppLoader h="40vh" />;
     }
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-            <Card w={{ base: "100%", md: "50%" }} radius="lg" mx="auto">
+            <Card withBorder>
                 <Card.Section inheritPadding withBorder py="sm">
-                    <Text>{props.id ? "Update" : "Create"} User</Text>
+                    <Text>{props.id ? "Update" : "Add"} Role</Text>
                 </Card.Section>
-                <Card.Section
-                    inheritPadding
-                    withBorder
-                    py="sm"
-                    className="!grid !gird-col-1 md:!grid-cols-2 gap-2"
-                >
-                    <Controller
-                        name="name"
-                        control={control}
-                        rules={{
-                            required: "Name field is required",
-                        }}
-                        render={({ field: { onChange, value } }) => (
-                            <TextBox
-                                label="Name"
-                                onChange={onChange}
-                                value={value}
-                                error={errors.name?.message}
-                            />
-                        )}
-                    />
-                    <Controller
-                        name="status"
-                        control={control}
-                        rules={{
-                            required: "Status field is required",
-                        }}
-                        render={({ field: { onChange, value } }) => (
-                            <SelectBox
-                                label="Status"
-                                onChange={onChange}
-                                data={statusOptions}
-                                value={value}
-                                error={errors.status?.message}
-                            />
-                        )}
-                    />
-                    <Controller
-                        name="grant_permission"
-                        control={control}
-                        render={({ field: { onChange, value } }) => (
-                            <Checkbox
-                                label="Grant Permission"
-                                description="Note: Ensure the 'Grant Permission' checkbox is unchecked or set to false as needed."
-                                onChange={onChange}
-                                checked={value}
-                                error={errors.grant_permission?.message}
-                                color={THEME.primary}
-                            />
-                        )}
-                    />
-                    <div className="col-span-full">
-                        <Fieldset
-                            legend="Permissions"
-                            w="100%"
-                            bg={THEME.cardBg}
-                        >
-                            {form.grant_permission ? (
+                <Card.Section inheritPadding withBorder py="sm">
+                    <Stack>
+                        <Controller
+                            name="name"
+                            control={control}
+                            rules={{
+                                required: "Name field is required",
+                            }}
+                            render={({ field: { onChange, value } }) => (
+                                <TextBox
+                                    label="Name"
+                                    onChange={onChange}
+                                    value={value}
+                                    error={errors.name?.message}
+                                />
+                            )}
+                        />
+                        <Controller
+                            name="grant_permission"
+                            control={control}
+                            render={({ field: { onChange, value } }) => (
+                                <Checkbox
+                                    label="Grant Permission"
+                                    description="Note: Ensure the 'Grant Permission' checkbox is unchecked or set to false as needed."
+                                    onChange={onChange}
+                                    checked={value}
+                                    error={errors.grant_permission?.message}
+                                />
+                            )}
+                        />
+
+                        <Fieldset legend="Permissions" w="100%">
+                            {watch("grant_permission") ? (
                                 <Text size="xs" c="dimmed" ta="center">
                                     Ensure that 'Grant Permission' is deselected
                                     or set to unchecked for customized
@@ -207,12 +166,12 @@ const RoleForm = () => {
                                                     module: string;
                                                     permissions: string[];
                                                 },
-                                                i: number
+                                                i: number,
                                             ) => (
                                                 <Grid.Col
                                                     span={{
                                                         base: 12,
-                                                        md: 6,
+                                                        md: 3,
                                                     }}
                                                     key={i}
                                                 >
@@ -239,17 +198,14 @@ const RoleForm = () => {
                                                                     const allSelected =
                                                                         item.permissions.every(
                                                                             (
-                                                                                p
+                                                                                p,
                                                                             ) =>
                                                                                 value.includes(
-                                                                                    p
-                                                                                )
+                                                                                    p,
+                                                                                ),
                                                                         );
                                                                     return (
                                                                         <Checkbox
-                                                                            color={
-                                                                                THEME.primary
-                                                                            }
                                                                             label={
                                                                                 item.module
                                                                             }
@@ -257,7 +213,7 @@ const RoleForm = () => {
                                                                                 allSelected
                                                                             }
                                                                             onChange={(
-                                                                                e
+                                                                                e,
                                                                             ) => {
                                                                                 const newPermissions =
                                                                                     e
@@ -268,19 +224,19 @@ const RoleForm = () => {
                                                                                                   [
                                                                                                       ...value,
                                                                                                       ...item.permissions,
-                                                                                                  ]
+                                                                                                  ],
                                                                                               ),
                                                                                           ]
                                                                                         : value.filter(
                                                                                               (
-                                                                                                  p
+                                                                                                  p,
                                                                                               ) =>
                                                                                                   !item.permissions.includes(
-                                                                                                      p
-                                                                                                  )
+                                                                                                      p,
+                                                                                                  ),
                                                                                           );
                                                                                 onChange(
-                                                                                    newPermissions
+                                                                                    newPermissions,
                                                                                 );
                                                                             }}
                                                                         />
@@ -297,7 +253,7 @@ const RoleForm = () => {
                                                                 {item.permissions.map(
                                                                     (
                                                                         pItem: string,
-                                                                        pI: number
+                                                                        pI: number,
                                                                     ) => (
                                                                         <Controller
                                                                             name="permissions"
@@ -314,17 +270,14 @@ const RoleForm = () => {
                                                                                 },
                                                                             }) => (
                                                                                 <Checkbox
-                                                                                    color={
-                                                                                        THEME.primary
-                                                                                    }
                                                                                     label={
                                                                                         pItem
                                                                                     }
                                                                                     checked={value.includes(
-                                                                                        pItem
+                                                                                        pItem,
                                                                                     )}
                                                                                     onChange={(
-                                                                                        e
+                                                                                        e,
                                                                                     ) => {
                                                                                         const newPermissions =
                                                                                             e
@@ -336,66 +289,64 @@ const RoleForm = () => {
                                                                                                   ]
                                                                                                 : value.filter(
                                                                                                       (
-                                                                                                          p
+                                                                                                          p,
                                                                                                       ) =>
                                                                                                           p !==
-                                                                                                          pItem
+                                                                                                          pItem,
                                                                                                   );
                                                                                         onChange(
-                                                                                            newPermissions
+                                                                                            newPermissions,
                                                                                         );
                                                                                     }}
                                                                                 />
                                                                             )}
                                                                         />
-                                                                    )
+                                                                    ),
                                                                 )}
                                                             </Stack>
                                                         </Card.Section>
                                                     </Card>
                                                 </Grid.Col>
-                                            )
+                                            ),
                                         )}
                                     </Grid>
                                 </ScrollArea>
                             )}
                         </Fieldset>
-                    </div>
+                    </Stack>
                 </Card.Section>
                 <Card.Section inheritPadding withBorder py="sm">
-                    <Flex justify="end" gap="xs">
+                    <Flex gap="sm" justify="end">
                         <Button
-                            type="button"
                             variant="outline"
-                            color={THEME.textDimmed}
+                            color="gray"
                             leftSection={
                                 <Icon
-                                    icon="material-symbols:close-rounded"
-                                    fontSize={20}
+                                    icon="hugeicons:cancel-01"
+                                    fontSize={18}
                                 />
                             }
+                            component={Link}
+                            href={`/admin/roles`}
                             disabled={
                                 resultCreate.isLoading || resultUpdate.isLoading
                             }
-                            component={Link}
-                            href="/admin/system/roles"
                         >
                             Cancel
                         </Button>
                         <Button
-                            type="submit"
-                            color={THEME.primary}
                             leftSection={
                                 <Icon
                                     icon="lucide:check-circle"
-                                    fontSize={20}
+                                    fontSize={18}
                                 />
                             }
+                            type="submit"
                             loading={
                                 resultCreate.isLoading || resultUpdate.isLoading
                             }
                         >
-                            {props.id ? "Update" : "Save"}
+                            {data ? "Update" : "Save"}
                         </Button>
                     </Flex>
                 </Card.Section>
@@ -404,5 +355,5 @@ const RoleForm = () => {
     );
 };
 
-RoleForm.layout = (page: any) => <Backend children={page} />;
+RoleForm.layout = (page: any) => <Panel children={page} title="Role" />;
 export default RoleForm;

@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SummaryController;
 use App\Http\Controllers\Api\TagController;
 use App\Http\Controllers\Api\TestController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -40,6 +41,7 @@ Route::middleware(['auth:api', 'tokenCheck'])->group(function () {
         Route::apiResource('questions', QuestionController::class)->except(['create', 'edit']);
     });
 
+    Route::apiResource('users', UserController::class)->except(['create', 'edit']);
     Route::apiResource('tags', TagController::class)->except(['create', 'edit']);
     Route::apiResource('favorites', FavoriteController::class)->except(['create', 'edit']);
     Route::apiResource('reports', ReportController::class)->except(['create', 'edit']);

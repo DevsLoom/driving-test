@@ -37,4 +37,13 @@ Route::prefix('admin')->group(function () {
             });
         });
     });
+
+    Route::prefix('roles')->group(function () {
+        Route::get('', fn() => inertia('panel/Roles/List'));
+        Route::get('create', fn() => inertia('panel/Roles/Form'));
+        Route::prefix('{id}')->group(function () {
+            Route::get('edit', fn($id) => inertia('panel/Roles/Form', ['id' => $id]));
+        });
+    });
+    Route::get('stuffs', fn() => inertia('panel/Stuffs/List'));
 });
