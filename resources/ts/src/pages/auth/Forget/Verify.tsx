@@ -2,12 +2,11 @@ import { router } from "@inertiajs/react";
 import { Button, Card, PinInput, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import Cookies from "js-cookie";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { THEME } from "../../../constants/theme";
-import Auth from "../../../layouts/Auth";
-import { useForgetVerifyMutation } from "../../../store/actions/slices/auth";
-import { alertMessage, validateError } from "../../../utils/helpers";
+import Auth from "~/src/layouts/Auth";
+import { alertMessage, validateError } from "~/src/lib/helpers";
+import { useForgetVerifyMutation } from "~/src/store/actions/slices/auth";
 
 type FormType = {
     user: string;
@@ -55,7 +54,7 @@ const ForgetVerify = () => {
                 setError(fieldName as keyof FormType, {
                     type: "manual",
                     message: errors[fieldName],
-                })
+                }),
             );
         } else {
             alertMessage({ title: err.message, icon: "error", timer: 2000 });
@@ -78,10 +77,10 @@ const ForgetVerify = () => {
 
     return (
         <Card.Section inheritPadding py="xl" px={80}>
-            <Text fz={32} component="h1" c={THEME.textLight} mb="xs">
+            <Text fz={32} component="h1" mb="xs">
                 Verification
             </Text>
-            <Text component="span" c={THEME.textDimmed} fz={14}>
+            <Text component="span" fz={14}>
                 Enter the 6-digit code sent to your email or phone
             </Text>
             <form
@@ -102,22 +101,15 @@ const ForgetVerify = () => {
                             />
                         )}
                     />
-                    <Text fz={14} c={THEME.danger}>
-                        {errors.code?.message}
-                    </Text>
+                    <Text fz={14}>{errors.code?.message}</Text>
                 </div>
 
-                <Button
-                    color={THEME.primary}
-                    fullWidth
-                    type="submit"
-                    loading={result.isLoading}
-                >
+                <Button fullWidth type="submit" loading={result.isLoading}>
                     Verify and Proceed
                 </Button>
             </form>
         </Card.Section>
     );
 };
-ForgetVerify.layout = (page: any) => <Auth children={page} />;
+ForgetVerify.layout = (page: any) => <Auth children={page} title="Verify" />;
 export default ForgetVerify;

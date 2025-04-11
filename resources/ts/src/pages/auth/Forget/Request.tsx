@@ -2,13 +2,11 @@ import { router } from "@inertiajs/react";
 import { Button, Card, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import Cookies from "js-cookie";
-import React from "react";
 import { Controller, useForm } from "react-hook-form";
-import TextBox from "../../../components/ui/TextBox";
-import { THEME } from "../../../constants/theme";
-import Auth from "../../../layouts/Auth";
-import { useForgetRequestMutation } from "../../../store/actions/slices/auth";
-import { alertMessage, validateError } from "../../../utils/helpers";
+import TextBox from "~/src/components/ui/TextBox";
+import Auth from "~/src/layouts/Auth";
+import { alertMessage, validateError } from "~/src/lib/helpers";
+import { useForgetRequestMutation } from "~/src/store/actions/slices/auth";
 
 type FormType = {
     user: string;
@@ -51,7 +49,7 @@ const ForgetRequest = () => {
                 setError(fieldName as keyof FormType, {
                     type: "manual",
                     message: errors[fieldName],
-                })
+                }),
             );
         } else {
             alertMessage({ title: err.message, icon: "error", timer: 2000 });
@@ -67,10 +65,10 @@ const ForgetRequest = () => {
 
     return (
         <Card.Section inheritPadding py="xl" px={80}>
-            <Text fz={32} component="h1" c={THEME.textLight} mb="xs">
+            <Text fz={32} component="h1" mb="xs">
                 Forgot Password
             </Text>
-            <Text component="span" c={THEME.textDimmed} fz={14}>
+            <Text component="span" fz={14}>
                 Enter the email address associated with your account
             </Text>
             <form
@@ -92,17 +90,14 @@ const ForgetRequest = () => {
                         />
                     )}
                 />
-                <Button
-                    color={THEME.primary}
-                    fullWidth
-                    type="submit"
-                    loading={result.isLoading}
-                >
+                <Button fullWidth type="submit" loading={result.isLoading}>
                     Recover Password
                 </Button>
             </form>
         </Card.Section>
     );
 };
-ForgetRequest.layout = (page: any) => <Auth children={page} />;
+ForgetRequest.layout = (page: any) => (
+    <Auth children={page} title="Forget Password" />
+);
 export default ForgetRequest;
