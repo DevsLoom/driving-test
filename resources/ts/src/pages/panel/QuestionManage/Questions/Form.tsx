@@ -1,10 +1,12 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { usePage } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import {
+    ActionIcon,
     Box,
     Button,
     Card,
     Fieldset,
+    Flex,
     Group,
     Radio,
     Stack,
@@ -15,16 +17,19 @@ import { useEffect } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import SearchTags from "~/src/components/panel/SearchTags";
 import EditorBox from "~/src/components/ui/EditorBox";
+import FileUploader from "~/src/components/ui/FileUploader";
 import SelectBox from "~/src/components/ui/SelectBox";
+import TextBox from "~/src/components/ui/TextBox";
 import { LANGUAGES } from "~/src/constants/Languages";
 import Panel from "~/src/layouts/Panel";
 import { alertMessage, mapSelect, validateError } from "~/src/lib/helpers";
+import { useFetchQuestionCategoriesQuery } from "~/src/store/actions/slices/questions/categories";
 import {
     useCreateQuestionMutation,
     useFetchQuestionQuery,
     useUpdateQuestionMutation,
-} from "~/src/store/actions/slices/theory/questions";
-import { QuestionFormType } from "~/src/types/theory/questions";
+} from "~/src/store/actions/slices/questions/questions";
+import { QuestionFormType } from "~/src/types/questions/questions";
 
 const QuestionForm = () => {
     const { props } = usePage();
@@ -32,8 +37,9 @@ const QuestionForm = () => {
     const [create, resCr] = useCreateQuestionMutation();
     const [update, resUp] = useUpdateQuestionMutation();
 
-    const { data, isFetching } = useFetchQuestionQuery(`${props.question_id}`, {
-        skip: !props.question_id,
+    const { data: categories } = useFetchQuestionCategoriesQuery("");
+    const { data, isFetching } = useFetchQuestionQuery(`${props.id}`, {
+        skip: !props.id,
         refetchOnMountOrArgChange: true,
     });
 
@@ -47,7 +53,7 @@ const QuestionForm = () => {
         watch,
     } = useForm<QuestionFormType>({
         defaultValues: {
-            test_id: "",
+            question_category_id: "",
             title: "",
             tags: [],
             options: [
@@ -62,6 +68,8 @@ const QuestionForm = () => {
                     explanation: "",
                 },
             ],
+            image: "",
+            video_url: "",
             status: "active",
         },
     });
@@ -70,6 +78,7 @@ const QuestionForm = () => {
         fields: options,
         append: oAppend,
         update: oUpdate,
+        remove: oRemove,
     } = useFieldArray({
         control,
         name: "options",
@@ -94,6 +103,7 @@ const QuestionForm = () => {
                 message: res.message,
                 color: "green",
             });
+            router.visit("/admin/question-manage/questions", { replace: true });
         }
     };
 
@@ -126,12 +136,6 @@ const QuestionForm = () => {
     };
 
     useEffect(() => {
-        if (props.id) {
-            setValue("test_id", props.id?.toString());
-        }
-    }, [props.id]);
-
-    useEffect(() => {
         if (data && Object.keys(data).length > 0) {
             reset();
             Object.keys(data).forEach((key) => {
@@ -153,7 +157,6 @@ const QuestionForm = () => {
                                     ),
                             });
                         });
-                        console.log("formatOptions", formatOptions);
                         setValue("options", formatOptions, {
                             shouldDirty: true,
                         });
@@ -177,6 +180,25 @@ const QuestionForm = () => {
                 <Card.Section inheritPadding py="sm" withBorder>
                     <Stack gap="md">
                         <Controller
+                            name="question_category_id"
+                            control={control}
+                            rules={{
+                                required: "The category is required.",
+                            }}
+                            render={({ field: { onChange, value } }) => (
+                                <SelectBox
+                                    label="Category"
+                                    data={mapSelect(categories, "name", "id")}
+                                    onChange={onChange}
+                                    value={value}
+                                    error={
+                                        errors?.question_category_id?.message
+                                    }
+                                    withAsterisk
+                                />
+                            )}
+                        />
+                        <Controller
                             name="title"
                             control={control}
                             rules={{
@@ -195,62 +217,72 @@ const QuestionForm = () => {
                         />
 
                         <Fieldset legend="Options" variant="filled">
-                            <Controller
-                                name="options"
-                                control={control}
-                                render={({ field: { onChange } }) => (
-                                    <Stack>
-                                        {watch("options").map((oItem, oI) => (
-                                            <Box pos="relative" key={oI}>
-                                                <Radio
-                                                    name="correctOption"
-                                                    variant="outline"
-                                                    pos="absolute"
-                                                    top={36}
-                                                    right={10}
-                                                    className="!z-50"
-                                                    checked={oItem.is_correct} // Ensures the radio is checked if `is_correct` is true
-                                                    onChange={() => {
-                                                        // Update the is_correct state based on the selected radio button
-                                                        const updatedOptions =
-                                                            options.map(
-                                                                (opt, idx) => ({
-                                                                    ...opt,
-                                                                    is_correct:
-                                                                        idx ===
-                                                                        oI, // Set only the selected option to true
-                                                                }),
-                                                            );
-                                                        oUpdate(
-                                                            oI,
-                                                            updatedOptions[oI],
+                            <Stack>
+                                {watch("options").map((oItem, oI) => (
+                                    <Box pos="relative" key={oI}>
+                                        <Flex
+                                            align="center"
+                                            pos="absolute"
+                                            top={36}
+                                            right={10}
+                                            gap="xs"
+                                            className="!z-50"
+                                        >
+                                            <Radio
+                                                name="correctOption"
+                                                variant="outline"
+                                                checked={oItem.is_correct}
+                                                onChange={() => {
+                                                    const updatedOptions =
+                                                        watch("options").map(
+                                                            (opt, index) => ({
+                                                                ...opt,
+                                                                is_correct:
+                                                                    index ===
+                                                                    oI,
+                                                            }),
                                                         );
-                                                        setValue(
-                                                            "options",
-                                                            updatedOptions,
-                                                            {
-                                                                shouldDirty:
-                                                                    true,
-                                                            },
-                                                        );
-                                                    }}
-                                                />
+                                                    setValue(
+                                                        "options",
+                                                        updatedOptions,
+                                                    );
+                                                }}
+                                            />
+                                            {/* <ActionIcon
+                                                variant="default"
+                                                size="sm"
+                                                // onClick={() => oRemove(oI)}
+
+                                                onClick={() => {
+                                                    oRemove(oI); // Remove option
+                                                    // Option removal is handled directly by `oRemove`
+                                                }}
+                                            >
+                                                <Icon icon="material-symbols:close-rounded" />
+                                            </ActionIcon> */}
+                                        </Flex>
+
+                                        <Controller
+                                            name={`options.${oI}.title`}
+                                            control={control}
+                                            render={({
+                                                field: { onChange, value },
+                                            }) => (
                                                 <EditorBox
                                                     label={`Option # ${oI + 1}`}
-                                                    onChange={(newValue) => {
-                                                        oUpdate(oI, {
-                                                            ...options[oI],
-                                                            title: newValue,
-                                                        });
-                                                    }}
-                                                    value={oItem.title}
+                                                    onChange={onChange}
+                                                    value={value}
+                                                    error={
+                                                        errors?.options?.[oI]
+                                                            ?.title?.message
+                                                    }
                                                     height="100px"
                                                 />
-                                            </Box>
-                                        ))}
-                                    </Stack>
-                                )}
-                            />
+                                            )}
+                                        />
+                                    </Box>
+                                ))}
+                            </Stack>
 
                             <Box ta="end" mt="lg">
                                 <Button
@@ -361,6 +393,32 @@ const QuestionForm = () => {
                         </Fieldset>
 
                         <Controller
+                            name="image"
+                            control={control}
+                            render={({ field: { onChange, value } }) => (
+                                <FileUploader
+                                    label="Image"
+                                    attachments={value}
+                                    changeHandler={onChange}
+                                    onRemove={() => setValue("image", "")}
+                                />
+                            )}
+                        />
+
+                        <Controller
+                            name="video_url"
+                            control={control}
+                            render={({ field: { onChange, value } }) => (
+                                <TextBox
+                                    label="Video URL"
+                                    onChange={onChange}
+                                    value={value}
+                                    error={errors?.video_url?.message}
+                                />
+                            )}
+                        />
+
+                        <Controller
                             name="tags"
                             control={control}
                             render={({ field: { onChange, value } }) => (
@@ -384,7 +442,7 @@ const QuestionForm = () => {
                                     fontSize={18}
                                 />
                             }
-                            // disabled={resCr.isLoading || resUp.isLoading}
+                            disabled={resCr.isLoading || resUp.isLoading}
                         >
                             Cancel
                         </Button>
@@ -396,10 +454,9 @@ const QuestionForm = () => {
                                 />
                             }
                             type="submit"
-                            // loading={resCr.isLoading || resUp.isLoading}
+                            loading={resCr.isLoading || resUp.isLoading}
                         >
-                            {/* {payload ? "Update" : "Save"} */}
-                            Save
+                            {data ? "Update" : "Save"}
                         </Button>
                     </Group>
                 </Card.Section>

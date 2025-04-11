@@ -21,7 +21,7 @@ export const PANEL_LINKS = [
                 icon: "bi:question-circle",
                 path: null,
                 items: [
-                    { label: "List", icon: "", path: "/test", items: [] },
+                    { label: "List", icon: "", path: "/admin/question-manage/questions", items: [] },
                     { label: "Categories", icon: "", path: "/admin/question-manage/categories", items: [] },
                 ],
             },
@@ -32,7 +32,7 @@ export const PANEL_LINKS = [
         items: [
             {
                 label: "Role Management",
-                icon: "healthicons:i-exam-multiple-choice-outline",
+                icon: "eos-icons:role-binding-outlined",
                 path: null,
                 items: [
                     { label: "Employees", icon: "", path: "/test", items: [] },

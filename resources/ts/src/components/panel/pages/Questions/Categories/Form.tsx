@@ -11,8 +11,10 @@ import {
     useCreateQuestionCategoryMutation,
     useUpdateQuestionCategoryMutation,
 } from "~/src/store/actions/slices/questions/categories";
-import { QuestionCategoryFormType, QuestionCategoryType } from "~/src/types/questions/categories";
-import { TestFormType, TestType } from "~/src/types/theory/tests";
+import {
+    QuestionCategoryFormType,
+    QuestionCategoryType,
+} from "~/src/types/questions/categories";
 
 const QuestionCategoryForm: FC<{
     close: () => void;
@@ -94,7 +96,10 @@ const QuestionCategoryForm: FC<{
             reset();
             Object.keys(payload).forEach((key) => {
                 if (payload[key] !== null) {
-                    setValue(key as keyof QuestionCategoryFormType, payload[key] ?? "");
+                    setValue(
+                        key as keyof QuestionCategoryFormType,
+                        payload[key] ?? "",
+                    );
                 }
             });
         }

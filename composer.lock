@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c6fd0d0c80a6f26e88b8effae3a1683d",
+    "content-hash": "1510d26172f619020833967d32194f6a",
     "packages": [
         {
             "name": "brick/math",
@@ -2028,6 +2028,50 @@
                 }
             ],
             "time": "2023-01-02T13:28:00+00:00"
+        },
+        {
+            "name": "leafwrap/role-sanctions",
+            "version": "0.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ashrafemon/role-sanctions.git",
+                "reference": "2f9779170d77a73e933b28319f080384302ef1d5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ashrafemon/role-sanctions/zipball/2f9779170d77a73e933b28319f080384302ef1d5",
+                "reference": "2f9779170d77a73e933b28319f080384302ef1d5",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Leafwrap\\RoleSanctions\\RoleSanctionServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Leafwrap\\RoleSanctions\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ashraf Emon",
+                    "email": "ashraf.emon143@gmail.com"
+                }
+            ],
+            "description": "Role sanction is a succinct and flexible way to add Role-based Permissions to Laravel",
+            "support": {
+                "issues": "https://github.com/ashrafemon/role-sanctions/issues",
+                "source": "https://github.com/ashrafemon/role-sanctions/tree/0.0.3"
+            },
+            "time": "2023-11-04T07:43:16+00:00"
         },
         {
             "name": "league/commonmark",

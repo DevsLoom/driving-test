@@ -28,8 +28,8 @@ import {
     useDeleteTestMutation,
     useFetchTestQuery,
     useFetchTestsQuery,
-} from "~/src/store/actions/slices/theory/tests";
-import { TestType } from "~/src/types/theory/tests";
+} from "~/src/store/actions/slices/tests";
+import { TestType } from "~/src/types/tests";
 
 const headers = [
     { field: "SL.", align: "left", w: 60 },
@@ -50,7 +50,7 @@ const TestList = () => {
     }, 800);
 
     const { data, isFetching } = useFetchTestsQuery(
-        `fields=id,name,image,position&limit=${params.limit}&offset=${params.offset}${
+        `fields=id,name,image&limit=${params.limit}&offset=${params.offset}${
             params.search ? `&search=${params.search}` : ""
         }`,
     );
@@ -179,7 +179,7 @@ const TestList = () => {
                     }
                     rows={items?.map((item, i) => (
                         <Table.Tr key={i}>
-                            <Table.Td>{item?.position}</Table.Td>
+                            <Table.Td>{i + 1}</Table.Td>
                             <Table.Td>
                                 <Group>
                                     <Image

@@ -20,22 +20,20 @@ Route::prefix('forget-password')->group(function () {
 Route::prefix('admin')->group(function () {
     Route::get('dashboard', fn() => inertia('panel/Dashboard'));
 
-    Route::prefix('question-manage')->group(function () {
-        Route::get('categories', fn() => inertia('panel/Questions/Categories/List'));
-    });
-
     Route::prefix('tests')->group(function () {
         Route::get('', fn() => inertia('panel/Tests/List'));
-
         Route::prefix('{id}')->group(function () {
             Route::get('show', fn($id) => inertia('panel/Tests/Show', ['id' => $id]));
+        });
+    });
 
-            Route::prefix('questions')->group(function () {
-                Route::get('create', fn($id) => inertia('panel/Tests/Questions/Form', ['id' => $id]));
-
-                Route::prefix('{question_id}')->group(function () {
-                    Route::get('edit', fn($id, $question_id) => inertia('panel/Tests/Questions/Form', ['id' => $id, 'question_id' => $question_id]));
-                });
+    Route::prefix('question-manage')->group(function () {
+        Route::get('categories', fn() => inertia('panel/QuestionManage/Categories/List'));
+        Route::prefix('questions')->group(function () {
+            Route::get('', fn() => inertia('panel/QuestionManage/Questions/List'));
+            Route::get('create', fn() => inertia('panel/QuestionManage/Questions/Form'));
+            Route::prefix('{id}')->group(function () {
+                Route::get('edit', fn($id) => inertia('panel/QuestionManage/Questions/Form', ['id' => $id]));
             });
         });
     });

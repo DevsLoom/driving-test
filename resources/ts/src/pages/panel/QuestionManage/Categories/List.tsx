@@ -49,7 +49,7 @@ const CategoryList = () => {
     }, 800);
 
     const { data, isFetching } = useFetchQuestionCategoriesQuery(
-        `fields=id,name,image,position&limit=${params.limit}&offset=${params.offset}${
+        `fields=id,name,image&limit=${params.limit}&offset=${params.offset}${
             params.search ? `&search=${params.search}` : ""
         }`,
     );
@@ -178,7 +178,7 @@ const CategoryList = () => {
                     }
                     rows={items?.map((item, i) => (
                         <Table.Tr key={i}>
-                            <Table.Td>{item?.position}</Table.Td>
+                            <Table.Td>{i + 1}</Table.Td>
                             <Table.Td>
                                 <Group>
                                     <Image

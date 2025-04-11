@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import Cookies from 'js-cookie';
 import { RootState } from '~/src/store';
-import { API_URL, jsonHeaders } from '../../config';
+import { API_URL, jsonHeaders } from '../config';
 
 const tests = createApi({
 	reducerPath: 'testsApi',

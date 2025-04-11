@@ -10,8 +10,8 @@ import { alertMessage, validateError } from "~/src/lib/helpers";
 import {
     useCreateTestMutation,
     useUpdateTestMutation,
-} from "~/src/store/actions/slices/theory/tests";
-import { TestFormType, TestType } from "~/src/types/theory/tests";
+} from "~/src/store/actions/slices/tests";
+import { TestFormType, TestType } from "~/src/types/tests";
 import SearchTags from "../../SearchTags";
 
 const TestForm: FC<{

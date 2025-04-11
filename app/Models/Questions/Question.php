@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Questions;
 
 use App\Services\TagService;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -12,7 +12,7 @@ class Question extends Model
 {
     use HasFactory, HasUuids, SoftDeletes;
 
-    protected $fillable = ['test_id', 'title', 'tags', 'position', 'status', 'created_by', 'updated_by', 'deleted_by'];
+    protected $fillable = ['question_category_id', 'title', 'tags', 'image', 'video_url', 'position', 'status', 'created_by', 'updated_by', 'deleted_by'];
     protected $casts    = ['tags' => 'array'];
 
     protected static function booted()
@@ -45,9 +45,9 @@ class Question extends Model
         });
     }
 
-    public function test()
+    public function category()
     {
-        return $this->belongsTo(Test::class);
+        return $this->belongsTo(QuestionCategory::class);
     }
 
     public function options()

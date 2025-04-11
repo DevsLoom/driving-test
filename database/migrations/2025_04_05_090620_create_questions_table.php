@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('questions', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('test_id')->nullable();
+            $table->string('question_category_id')->nullable();
             $table->text('title')->nullable();
             $table->json('tags')->nullable();
+            $table->string('image')->nullable();
+            $table->string('video_url')->nullable();
 
             $table->integer('position')->nullable()->default(0);
             $table->string('status')->nullable()->default('active');

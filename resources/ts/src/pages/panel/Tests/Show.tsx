@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import AppLoader from "~/src/components/ui/AppLoader";
 import Panel from "~/src/layouts/Panel";
 import { imageUrlBuilder } from "~/src/lib/helpers";
-import { useFetchTestQuery } from "~/src/store/actions/slices/theory/tests";
+import { useFetchTestQuery } from "~/src/store/actions/slices/tests";
 
 const TestShow = () => {
     const { props } = usePage();

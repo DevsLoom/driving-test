@@ -1,9 +1,9 @@
-import { TestType } from "./categories";
+import { QuestionCategoryType } from "./categories";
 
 export type QuestionType = {
 	id: string;
-	test_id: string;
-	test: TestType;
+	category_id: string;
+	category: QuestionCategoryType;
 	title: string;
 	options: {
         id: string;
@@ -26,7 +26,7 @@ export type QuestionType = {
 };
 
 export type QuestionFormType = {
-	test_id: string;
+	question_category_id: string;
     title: string;
     tags: string[];
     options: {
@@ -37,5 +37,7 @@ export type QuestionFormType = {
         language: string;
         explanation: string;
     }[];
+    image: string,
+    video_url: string,
     status: string;
 };

@@ -6,7 +6,7 @@ import { API_URL, jsonHeaders } from '../../config';
 const questions = createApi({
 	reducerPath: 'questionsApi',
 	baseQuery: fetchBaseQuery({
-		baseUrl: API_URL,
+		baseUrl: API_URL + '/question-manage',
 		headers: jsonHeaders,
 		prepareHeaders: (headers, { getState }) => {
 			const state = getState() as RootState;

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Questions;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class QuestionOptionMap extends Model
+class QuestionCorrectOption extends Model
 {
     use HasUuids, SoftDeletes;
 

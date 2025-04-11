@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Questions;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\QuestionRequest;
-use App\Models\Option;
-use App\Models\Question;
-use App\Models\QuestionCorrectOption;
-use App\Models\QuestionExplanation;
-use App\Models\QuestionOptionMap;
+use App\Http\Requests\Questions\QuestionRequest;
+use App\Models\Questions\Option;
+use App\Models\Questions\Question;
+use App\Models\Questions\QuestionCorrectOption;
+use App\Models\Questions\QuestionExplanation;
+use App\Models\Questions\QuestionOptionMap;
 use Exception;
 
 class QuestionController extends Controller
@@ -24,7 +24,7 @@ class QuestionController extends Controller
             $orderBy        = request()->input('order_by') ?? 'position';
             $orderDirection = request()->input('order_direction') ?? 'desc';
 
-            $fields    = [primaryKey(), 'test_id', 'title'];
+            $fields    = [primaryKey(), 'question_category_id', 'title'];
             $condition = [];
             $relations = [
                 'options:id,title',
@@ -84,7 +84,7 @@ class QuestionController extends Controller
     public function store(QuestionRequest $request)
     {
         try {
-            $lastEntry = Question::where(['test_id' => request()->input('test_id')])->latest()->first();
+            $lastEntry = Question::latest()->first();
             $position  = $lastEntry ? $lastEntry->position + 1 : 1;
 
             if ($query = Question::query()->create(array_merge($request->validated(), ['position' => $position]))) {
@@ -128,7 +128,7 @@ class QuestionController extends Controller
             $searchKey = request()->input('searchKey') ?? primaryKey();
             $condition = [$searchKey => $id];
 
-            $fields    = [primaryKey(), 'test_id', 'title', 'tags', 'position', 'status'];
+            $fields    = [primaryKey(), 'question_category_id', 'title', 'image', 'video_url', 'tags', 'position', 'status'];
             $relations = [
                 'options:id,title',
                 'questionCorrectOption:id,question_id,option_id',
@@ -171,47 +171,70 @@ class QuestionController extends Controller
                 return messageResponse('Question not found...', 404, 'error');
             }
 
-            $existingCorrectOptions = QuestionCorrectOption::query()->where('question_id', $id)->pluck('option_id')->toArray();
-            $newCorrectOptions      = [];
+            $query->update($request->validated());
 
-            foreach (request()->input('options') as $item) {
-                $oQuery = Option::query()->where([primaryKey() => $item['id']])->first();
-                $oQuery->update(['title' => $item['title']]);
+            if (request()->has('options')) {
+                $submittedOptions   = request()->input('options');
+                $submittedOptionIds = collect($submittedOptions)->pluck('id')->filter()->toArray();
+                $existingOptionIds  = $query->options()->pluck('options.id')->toArray();
 
-                if (!empty($item['is_correct'])) {
-                    $newCorrectOptions[] = $item['id'];
-                    if (!in_array($item['id'], $existingCorrectOptions)) {
+                $optionsToDelete = array_diff($existingOptionIds, $submittedOptionIds);
+
+                Option::whereIn('id', $optionsToDelete)->delete();
+                QuestionOptionMap::whereIn('option_id', $optionsToDelete)->where('question_id', $query->id)->delete();
+                QuestionCorrectOption::whereIn('option_id', $optionsToDelete)->where('question_id', $query->id)->delete();
+                QuestionCorrectOption::where('question_id', $query->id)->delete();
+
+                foreach ($submittedOptions as $item) {
+                    if (isset($item['id'])) {
+                        $option = Option::find($item['id']);
+                        $option->update(['title' => $item['title']]);
+                    } else {
+                        $option = Option::create(['title' => $item['title']]);
+                        QuestionOptionMap::create([
+                            'question_id' => $query->id,
+                            'option_id'   => $option->id,
+                        ]);
+                    }
+
+                    if (!empty($item['is_correct'])) {
                         QuestionCorrectOption::create([
                             'question_id' => $query->id,
-                            'option_id'   => $item['id'],
+                            'option_id'   => $option->id,
                         ]);
                     }
                 }
             }
 
-            $optionsToRemove = array_diff($existingCorrectOptions, $newCorrectOptions);
-            if (!empty($optionsToRemove)) {
-                QuestionCorrectOption::query()->where('question_id', $id)->whereIn('option_id', $optionsToRemove)->delete();
-            }
+            if (request()->has('explanations')) {
+                $submittedExplanations = request()->input('explanations');
+                $submittedLanguages    = collect($submittedExplanations)->pluck('language')->toArray();
+                $existingLanguages     = $query->explanations()->pluck('language')->toArray();
 
-            foreach (request()->input('explanations') as $item) {
-                if (isset($item['id'])) {
-                    $eQuery = QuestionExplanation::query()->where([primaryKey() => $item['id']])->first();
-                    $eQuery->update([
-                        'language'    => $item['language'],
-                        'explanation' => $item['explanation'],
-                    ]);
-                } else {
-                    QuestionExplanation::create([
+                $languagesToDelete = array_diff($existingLanguages, $submittedLanguages);
+                QuestionExplanation::where('question_id', $query->id)
+                    ->whereIn('language', $languagesToDelete)
+                    ->delete();
+
+                foreach ($submittedExplanations as $item) {
+                    $existing = QuestionExplanation::where([
                         'question_id' => $query->id,
                         'language'    => $item['language'],
-                        'explanation' => $item['explanation'],
-                    ]);
+                    ])->first();
+
+                    if ($existing) {
+                        $existing->update(['explanation' => $item['explanation']]);
+                    } else {
+                        QuestionExplanation::create([
+                            'question_id' => $query->id,
+                            'language'    => $item['language'],
+                            'explanation' => $item['explanation'],
+                        ]);
+                    }
                 }
             }
 
-            $query->update($request->validated());
-            return entityResponse($query, 201, 'success', 'Question updated successfully.');
+            return entityResponse($query, 200, 'success', 'Question updated successfully.');
         } catch (Exception $e) {
             return messageResponse($e->getMessage(), 500, 'server_error');
         }

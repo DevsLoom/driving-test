@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Questions;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -24,9 +24,11 @@ class QuestionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'test_id'                    => 'sometimes|required',
+            'question_category_id'       => 'sometimes|required',
             'title'                      => 'sometimes|required',
             'tags'                       => 'sometimes|array',
+            'image'                      => 'sometimes',
+            'video_url'                  => 'sometimes',
 
             'options'                    => 'sometimes|array',
             'options.*.title'            => 'sometimes',
