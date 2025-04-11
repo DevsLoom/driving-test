@@ -52,7 +52,7 @@ Route::apiResource('media-files', MediaController::class)->only(['index', 'store
 Route::get('summaries', [SummaryController::class, 'summary']);
 
 Route::get('init', function () {
-    Artisan::call('migrate --seed');
+    Artisan::call('migrate:fresh --seed');
     Artisan::call('optimize:clear');
     return 'Initial process done';
 });
