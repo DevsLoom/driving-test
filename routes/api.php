@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\SummaryController;
 use App\Http\Controllers\Api\TagController;
 use App\Http\Controllers\Api\TestController;
 use App\Http\Controllers\Api\UserController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -49,3 +50,9 @@ Route::middleware(['auth:api', 'tokenCheck'])->group(function () {
 
 Route::apiResource('media-files', MediaController::class)->only(['index', 'store', 'destroy']);
 Route::get('summaries', [SummaryController::class, 'summary']);
+
+Route::get('init', function () {
+    Artisan::call('migrate:fresh --seed');
+    Artisan::call('optimize:clear');
+    return 'Initial process done';
+});
