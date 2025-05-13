@@ -186,11 +186,12 @@ const StuffList = () => {
                             <Table.Td>{i + 1}</Table.Td>
                             <Table.Td>
                                 <Group>
-                                    <Image
+                                    {/* <Image
                                         w={40}
                                         h={40}
                                         src={imageUrlBuilder(item?.avatar)}
-                                    />
+                                    /> */}
+                                    
                                     <Text size="sm">{`${item?.first_name || ""} ${item?.last_name || ""}`}</Text>
                                 </Group>
                             </Table.Td>
